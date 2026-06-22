@@ -1,0 +1,358 @@
+/* ==========================================================
+   login.css — BusTrack Login Page specific styles
+   Escala: 1rem = 1rem (via font-size: 62.5% no :root)
+   ========================================================== */
+
+/* ----------------------------------------------------------
+   1. Alerta (compatibilidade com JS existente)
+   ---------------------------------------------------------- */
+#alert-message {
+  display: none;              /* JS liga via JS */
+  position: fixed;
+  top: 2.4rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  padding: 1.2rem 2.4rem;
+  border-radius: 1.2rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 0.8rem 2.4rem rgba(0,0,0,0.12);
+  transition: opacity 0.25s ease;
+}
+
+#alert-message.alert-success {
+  display: block;
+  background: var(--color-primary);
+  color: var(--color-dark);
+}
+
+#alert-message.alert-error {
+  display: block;
+  background: var(--color-danger);
+  color: var(--color-white);
+}
+
+/* ----------------------------------------------------------
+  2. Layout principal (Desktop-first acima de 102.4rem)
+  ---------------------------------------------------------- */
+.login-layout {
+  display: flex;
+  flex: 1;
+  min-height: 100vh;
+  justify-content: space-evenly;
+}
+
+/* ----------------------------------------------------------
+   3. Coluna esquerda — Imagem (~45%)
+   ---------------------------------------------------------- */
+.login-image {
+  flex: 0 0 45%;
+  position: relative;
+  overflow: hidden;
+  padding: 3rem 0;
+}
+
+.login-image img {
+  display: block;
+  border-radius: 2rem;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* ----------------------------------------------------------
+   4. Coluna direita — Painel de formulário (~55%)
+   ---------------------------------------------------------- */
+.login-panel {
+  flex: 0 0 45%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 6.4rem 8rem;
+  background: var(--color-bg);
+}
+
+/* ----------------------------------------------------------
+   5. Badge
+   ---------------------------------------------------------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 6rem;
+  height: 6rem;
+  background: var(--color-primary);
+  color: var(--color-dark);
+  border-radius: 1.6rem 1.6rem 1.6rem 0;
+  margin-bottom: 2rem;
+  flex-shrink: 0;
+  font-size: 2rem;
+}
+
+/* ----------------------------------------------------------
+   6. Títulos do formulário
+   ---------------------------------------------------------- */
+.login-title {
+  font-family: var(--font-title);
+  font-size: 3.8rem;
+  color: var(--color-dark);
+  margin-bottom: 1.2rem;
+  line-height: 1.15;
+}
+
+.login-subtitle {
+  font-family: var(--font-main);
+  font-size: 1.8rem;
+  color: var(--color-muted);
+  line-height: 1.6;
+  margin-bottom: 3.6rem;
+}
+
+/* ----------------------------------------------------------
+   7. Campos de input
+   ---------------------------------------------------------- */
+.field-wrapper {
+  margin-bottom: 1.6rem;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  border: 0.1rem solid var(--color-muted-light);
+  border-radius: 1.2rem;
+  padding: 1.4rem 1.8rem;
+  background: var(--color-white);
+  transition: border-color var(--transition-speed) var(--transition-ease),
+              box-shadow var(--transition-speed) var(--transition-ease);
+}
+
+.input-group:focus-within {
+  border-color: var(--color-dark);
+  box-shadow: 0 0 0 0.4rem var(--color-focus-ring);
+}
+
+.input-icon {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  stroke: var(--color-muted-light);
+}
+
+.input-group input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--font-main);
+  font-size: 1.6rem;
+  color: var(--color-dark);
+  min-width: 0;
+}
+
+.input-group input::placeholder {
+  color: var(--color-muted);
+  opacity: 1;
+}
+
+/* ----------------------------------------------------------
+   8. Campo de senha — toggle dentro do input
+   ---------------------------------------------------------- */
+.password-wrapper {
+  position: relative;
+}
+
+.toggle-eye {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem;
+  color: var(--color-muted-light);
+  font-size: 1.6rem;
+  line-height: 1;
+  transition: color var(--transition-speed) var(--transition-ease);
+}
+
+.toggle-eye:hover {
+  color: var(--color-dark);
+}
+
+/* ----------------------------------------------------------
+   9. Link "Esqueceu a senha?"
+   ---------------------------------------------------------- */
+.forgot-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-main);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-dark);
+  text-decoration: none;
+  margin-bottom: 3.2rem;
+  width: fit-content;
+  transition: opacity var(--transition-speed) var(--transition-ease);
+}
+
+.forgot-link svg {
+  stroke: var(--color-dark);
+  flex-shrink: 0;
+}
+
+.forgot-link:hover {
+  opacity: 0.7;
+}
+
+.forgot-link:focus-visible {
+  outline: 0.2rem solid var(--color-dark);
+  outline-offset: 0.4rem;
+  border-radius: 0.4rem;
+}
+
+/* ----------------------------------------------------------
+   10. Botão Entrar
+   ---------------------------------------------------------- */
+.btn-entrar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  border: none;
+  border-radius: 99rem;
+  background: var(--color-primary);
+  font-family: var(--font-main);
+  font-size: 1.6rem;
+  font-weight: 700;
+  padding: 1.8rem;
+  cursor: pointer;
+  transition: background var(--transition-speed) var(--transition-ease),
+              transform var(--transition-speed) var(--transition-ease),
+              box-shadow var(--transition-speed) var(--transition-ease);
+  box-shadow: 0 1.2rem 2.4rem -0.8rem var(--color-primary-shadow);
+  color: var(--color-dark);
+}
+
+.btn-entrar:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  transform: translateY(-0.1rem);
+}
+
+.btn-entrar:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-entrar:disabled {
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+/* ----------------------------------------------------------
+   11. Spinner de loading (compatível com JS existente)
+   ---------------------------------------------------------- */
+.spinner {
+  display: none;
+  width: 1.8rem;
+  height: 1.8rem;
+  border: 0.2rem solid rgba(7, 19, 59, 0.25);
+  border-top-color: var(--color-dark);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+/* JS deve adicionar a classe .loading ao botão para exibir */
+.btn-entrar.loading .btn-label {
+  opacity: 0.6;
+}
+
+.btn-entrar.loading .spinner {
+  display: block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ----------------------------------------------------------
+  12. Tablet (76.8rem – 102.4rem)
+  ---------------------------------------------------------- */
+@media (max-width: 102.4rem) {
+  .login-panel {
+    padding: 4.8rem 5.6rem;
+  }
+
+  .login-title {
+    font-size: 3.2rem;
+  }
+}
+
+/* ----------------------------------------------------------
+  13. Mobile (≤ 76.8rem)
+  ---------------------------------------------------------- */
+@media (max-width: 76.8rem) {
+
+  .login-layout {
+    flex-direction: column;
+  }
+
+  /* Imagem no topo */
+  .login-image {
+    flex: none;
+    width: 100%;
+    height: 28rem;
+    border-radius: 0 0 2.4rem 2.4rem;
+    overflow: hidden;
+    padding: 1.5rem;
+  }
+
+  .login-image img {
+    height: 100%;
+    border-radius: 2rem;
+  }
+
+  /* Formulário abaixo, largura total */
+  .login-panel {
+    flex: 1;
+    width: 100%;
+    padding: 3.2rem 2.4rem 4.8rem;
+    justify-content: flex-start;
+    margin-top: -7rem;
+  }
+
+  /* Badge menor no mobile */
+  .badge {
+    width: 5.2rem;
+    height: 5.2rem;
+    z-index: 1;
+  }
+
+  .login-title {
+    font-size: 2.8rem;
+  }
+
+  .login-subtitle {
+    margin-bottom: 2.8rem;
+  }
+
+  .forgot-link {
+    margin-bottom: 2.4rem;
+  }
+}
+
+@media (max-width: 36rem) {
+  .login-panel {
+    padding: 3.2rem 2rem 4rem;
+  }
+
+  .login-title {
+    font-size: 2.4rem;
+  }
+}

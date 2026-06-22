@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Painel Administrativo BusGo - Monitoramento de frotas e logística de rotas escolares.">
+  <title>Admin Dashboard</title>
+
+  <!-- Font Awesome para ícones modernos -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <!-- Estilos globais e locais -->
+  <link rel="stylesheet" href="../styles/main.css">
+  <link rel="stylesheet" href="../styles/admindashboard.css">
+</head>
+
+<body>
+
+  <!-- Mensagem de Alerta Flutuante (Snackbars) -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- CONTAINER PRINCIPAL -->
+  <div class="admin-container">
+
+    <!-- SIDEBAR LATERAL (MENU FIXO) -->
+    <aside class="admin-sidebar" id="admin-sidebar">
+      <div class="sidebar-brand">
+        <div class="logo-box">
+          <i class="fa-solid fa-bus"></i>
+        </div>
+        <span class="logo-text">BUSWAITER</span>
+        <button class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Fechar menu">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Menu de Navegação -->
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-target="dashboard" id="nav-dashboard">
+          <div class="nav-icon-wrapper">
+            <i class="fa-solid fa-chart-line"></i>
+          </div>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-item" data-target="monitoring" id="nav-monitoring">
+          <div class="nav-icon-wrapper">
+            <i class="fa-solid fa-map-location-dot"></i>
+          </div>
+          <span>Tempo Real</span>
+        </button>
+        <button class="nav-item" data-target="vehicles" id="nav-vehicles">
+          <div class="nav-icon-wrapper">
+            <i class="fa-solid fa-bus"></i>
+          </div>
+          <span>Veículos</span>
+        </button>
+        <button class="nav-item" data-target="reports" id="nav-reports">
+          <div class="nav-icon-wrapper">
+            <i class="fa-solid fa-chart-pie"></i>
+          </div>
+          <span>Relatórios</span>
+        </button>
+        <button class="nav-item" data-target="alerts" id="nav-alerts">
+          <div class="nav-icon-wrapper" class="alert-icon-nav">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span class="nav-badge" id="nav-alerts-badge">3</span>
+          </div>
+          <span>Alertas</span>
+        </button>
+        <button class="nav-item" data-target="settings" id="nav-settings">
+          <div class="nav-icon-wrapper">
+            <i class="fa-solid fa-sliders"></i>
+          </div>
+          <span>Configurações</span>
+        </button>
+      </nav>
+
+      <!-- Perfil do Administrador no Rodapé -->
+      <div class="sidebar-footer">
+        <div class="user-profile">
+          <div class="avatar-container">
+            <img src="../assets/avatar.png" alt="Foto de Natalie" class="profile-avatar"
+              onerror="this.src='https://i.pravatar.cc/100?img=47'">
+            <span class="status-indicator online"></span>
+          </div>
+          <div class="user-info">
+            <span class="user-name">Natalie Barros</span>
+            <span class="user-role">Super Admin</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="admin-main">
+
+      <!-- HEADER SUPERIOR -->
+      <header class="admin-header">
+        <div class="header-left">
+          <button class="menu-toggle-btn" id="menu-toggle-btn" aria-label="Abrir menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="header-greeting">
+            <h1 id="header-greeting-title">Olá, Natalie</h1>
+            <p id="header-greeting-subtitle">Monitoramento de frotas e logística de rotas escolares.</p>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <!-- Campo de Busca -->
+          <div class="header-search">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="global-search" placeholder="Buscar veículo ou motorista...">
+            <div id="search-results-dropdown" class="search-dropdown hidden"></div>
+          </div>
+
+          <!-- Informações de Data/Turno -->
+          <div class="header-info-chips">
+            <div class="info-chip">
+              <i class="fa-regular fa-calendar"></i>
+              <span id="header-date">Hoje, 21 de Junho</span>
+            </div>
+            <div class="info-chip">
+              <i class="fa-regular fa-clock"></i>
+              <span>Turno: 08:00 - 16:00</span>
+            </div>
+          </div>
+
+          <!-- Central de Notificações -->
+          <div class="header-notification">
+            <button class="notification-trigger" id="notification-trigger" aria-label="Notificações">
+              <i class="fa-regular fa-bell"></i>
+              <span class="notification-counter" id="bell-counter">3</span>
+            </button>
+
+            <!-- Dropdown de Notificações -->
+            <div class="notification-dropdown hidden" id="notification-dropdown">
+              <div class="dropdown-header">
+                <h3>Notificações Recentes</h3>
+                <button id="mark-all-read">Limpar tudo</button>
+              </div>
+              <ul class="notification-list" id="notification-list">
+                <!-- Inserido dinamicamente via JS -->
+              </ul>
+              <div class="dropdown-footer">
+                <button class="view-all-alerts-btn" id="btn-view-all-alerts">Ver todos os alertas</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Avatar (Mobile/Geral) -->
+          <div class="header-avatar">
+            <img src="../assets/avatar.png" alt="Avatar Natalie" class="avatar-img"
+              onerror="this.src='https://i.pravatar.cc/100?img=47'">
+          </div>
+        </div>
+      </header>
+
+      <!-- CARDS SUPERIORES KPI (SOBREPOSTOS AO HEADER) -->
+      <section class="kpi-grid">
+        <!-- Card 1: Ônibus em Operação -->
+        <article class="kpi-card" id="kpi-bus">
+          <div class="kpi-card-header">
+            <div class="kpi-icon-wrapper blue">
+              <i class="fa-solid fa-bus"></i>
+            </div>
+            <span class="kpi-title">Ônibus em operação</span>
+          </div>
+          <div class="kpi-card-body">
+            <span class="kpi-value" id="kpi-bus-value">0 / 0</span>
+            <div class="kpi-indicator">
+              <span class="indicator-percentage text-green"><i class="fa-solid fa-circle"></i> Simulação Rodando</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 2: Rotas Ativas -->
+        <article class="kpi-card" id="kpi-routes">
+          <div class="kpi-card-header">
+            <div class="kpi-icon-wrapper purple">
+              <i class="fa-solid fa-route"></i>
+            </div>
+            <span class="kpi-title">Rotas ativas</span>
+          </div>
+          <div class="kpi-card-body">
+            <span class="kpi-value" id="kpi-routes-value">4</span>
+            <div class="kpi-indicator">
+              <span class="indicator-percentage text-green"><i class="fa-solid fa-arrow-up-long"></i> 100%</span>
+              <span class="indicator-label">cobertura escolar</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 3: Alunos Transportados -->
+        <article class="kpi-card" id="kpi-students">
+          <div class="kpi-card-header">
+            <div class="kpi-icon-wrapper green">
+              <i class="fa-solid fa-users"></i>
+            </div>
+            <span class="kpi-title">Alunos transportados</span>
+          </div>
+          <div class="kpi-card-body">
+            <span class="kpi-value" id="kpi-students-value">0</span>
+            <div class="kpi-indicator">
+              <span class="indicator-percentage text-green"><i class="fa-solid fa-arrow-up-long"></i> 14%</span>
+              <span class="indicator-label">vs ontem</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 4: Alertas Ativos (Efeito Gradient do Mockup) -->
+        <article class="kpi-card gradient-card" id="kpi-alerts">
+          <div class="kpi-card-header">
+            <div class="kpi-icon-wrapper white-translucent">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <span class="kpi-title">Alertas ativos</span>
+          </div>
+          <div class="kpi-card-body">
+            <span class="kpi-value" id="kpi-alerts-value">0</span>
+            <div class="kpi-indicator">
+              <span class="indicator-percentage text-white"><i class="fa-solid fa-arrow-down-long"></i> 5%</span>
+              <span class="indicator-label text-white">vs última hora</span>
+            </div>
+          </div>
+          <button class="gradient-card-btn" id="btn-quick-alerts" aria-label="Ver alertas ativos">
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </article>
+      </section>
+
+      <!-- CONTEÚDO DINÂMICO (SEÇÕES/ABAS) -->
+      <div class="content-wrapper">
+
+        <!-- PÁGINA 1: DASHBOARD PRINCIPAL -->
+        <section class="tab-content active" id="dashboard-tab">
+          <div class="dashboard-layout">
+
+            <!-- Painel Principal (Mapa Resumido) -->
+            <div class="dashboard-map-panel">
+              <div class="panel-header">
+                <h2>Localização das Frotas</h2>
+                <div class="map-controls">
+                  <span class="map-badge"><span class="pulse-dot"></span> Monitoramento GPS Ativo</span>
+                </div>
+              </div>
+
+              <!-- Container do Mapa Resumido -->
+              <div class="map-container-wrapper">
+                <div class="map-placeholder" id="dashboard-map">
+                  <!-- SVG do mapa injetado via JS -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Painel Lateral (Lista de Ônibus Ativos) -->
+            <div class="dashboard-sidebar-panel">
+              <div class="panel-header">
+                <h2>Ônibus em Trânsito</h2>
+                <span class="badge-count" id="active-buses-count">0 ativos</span>
+              </div>
+
+              <div class="active-buses-list scrollable-container" id="dashboard-active-buses">
+                <!-- Inserido dinamicamente via JS -->
+              </div>
+            </div>
+
+            <!-- Painel Inferior (Resumo de Ocorrências do Dia) -->
+            <div class="dashboard-bottom-panel">
+              <div class="panel-header">
+                <h2>Eventos do Dia (Registro Cronológico)</h2>
+                <button class="clear-events-btn" id="btn-clear-logs">Limpar Registro</button>
+              </div>
+
+              <div class="events-log-container scrollable-container" id="dashboard-events-log">
+                <!-- Inserido dinamicamente via JS -->
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- PÁGINA 2: MONITORAMENTO EM TEMPO REAL -->
+        <section class="tab-content" id="monitoring-tab">
+          <div class="monitoring-layout">
+
+            <!-- Mapa em Tela Grande -->
+            <div class="big-map-panel">
+              <!-- Overlay de Informações Rápidas e Legenda -->
+              <div class="map-overlay-card legend-card">
+                <h3>Legenda de Rotas</h3>
+                <ul class="legend-list">
+                  <li><span class="legend-color blue"></span> <strong>Rota Norte (Azul):</strong> Zona Escolar 1</li>
+                  <li><span class="legend-color green"></span> <strong>Rota Sul (Verde):</strong> Zona Escolar 2</li>
+                  <li><span class="legend-color red"></span> <strong>Rota Leste (Vermelho):</strong> Expresso Integrado
+                  </li>
+                  <li><span class="legend-color yellow"></span> <strong>Rota Oeste (Amarelo):</strong> Linha Circular
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Overlay do Detalhe do Veículo Selecionado -->
+              <div class="map-overlay-card details-card hidden" id="selected-bus-overlay">
+                <!-- Inserido via JS quando um ônibus for clicado no mapa -->
+              </div>
+
+              <!-- Container do Mapa Grande -->
+              <div class="map-container-wrapper large-map">
+                <div class="map-placeholder" id="monitoring-large-map">
+                  <!-- SVG do mapa em tela cheia injetado via JS -->
+                </div>
+                <div class="map-floating-controls">
+                  <button id="btn-zoom-in" title="Aumentar Zoom"><i class="fa-solid fa-plus"></i></button>
+                  <button id="btn-zoom-out" title="Diminuir Zoom"><i class="fa-solid fa-minus"></i></button>
+                  <button id="btn-recenter" title="Recentralizar Mapa"><i class="fa-solid fa-crosshairs"></i></button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Painel Lateral Direito (Ônibus Monitorados) -->
+            <div class="monitoring-sidebar-panel">
+              <div class="panel-header">
+                <h2>Frota Monitorada</h2>
+                <div class="search-mini">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                  <input type="text" id="monitoring-search" placeholder="Filtrar frota...">
+                </div>
+              </div>
+
+              <div class="monitored-buses-list scrollable-container" id="monitoring-bus-list">
+                <!-- Inserido dinamicamente via JS -->
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- PÁGINA 3: GESTÃO DE VEÍCULOS -->
+        <section class="tab-content" id="vehicles-tab">
+          <div class="page-card">
+            <div class="page-card-header">
+              <div class="header-info">
+                <h2>Gerenciamento de Veículos</h2>
+                <p>Cadastre, edite e remova veículos da frota ativa do sistema.</p>
+              </div>
+              <button class="btn-primary" id="btn-add-vehicle">
+                <i class="fa-solid fa-plus"></i> Adicionar Veículo
+              </button>
+            </div>
+
+            <!-- Tabela Principal de Veículos -->
+            <div class="table-container">
+              <table class="data-table" id="vehicles-table">
+                <thead>
+                  <tr>
+                    <th>Número</th>
+                    <th>Placa</th>
+                    <th>Modelo</th>
+                    <th>Ano</th>
+                    <th>Capacidade Max.</th>
+                    <th>Motorista Responsável</th>
+                    <th>Status de Rastreamento</th>
+                    <th class="actions-column">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="vehicles-table-body">
+                  <!-- Inserido via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- PÁGINA 4: RELATÓRIO DE PARADAS -->
+        <section class="tab-content" id="reports-tab">
+          <div class="reports-layout">
+
+            <!-- Cards de Indicadores -->
+            <div class="reports-indicators-grid">
+              <div class="indicator-small-card">
+                <div class="indicator-icon blue">
+                  <i class="fa-solid fa-circle-stop"></i>
+                </div>
+                <div class="indicator-info">
+                  <span class="indicator-label">Total de Paradas</span>
+                  <span class="indicator-num" id="report-total-stops">0</span>
+                </div>
+              </div>
+
+              <div class="indicator-small-card">
+                <div class="indicator-icon green">
+                  <i class="fa-regular fa-clock"></i>
+                </div>
+                <div class="indicator-info">
+                  <span class="indicator-label">Tempo Médio de Parada</span>
+                  <span class="indicator-num" id="report-avg-time">1m 45s</span>
+                </div>
+              </div>
+
+              <div class="indicator-small-card">
+                <div class="indicator-icon danger">
+                  <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
+                <div class="indicator-info">
+                  <span class="indicator-label">Atrasos Registrados</span>
+                  <span class="indicator-num" id="report-delays-count">0</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Filtros de Busca -->
+            <div class="page-card filter-card">
+              <div class="filter-grid">
+                <div class="form-group">
+                  <label for="filter-date">Data de Consulta</label>
+                  <input type="date" id="filter-date" value="2026-06-21">
+                </div>
+                <div class="form-group">
+                  <label for="filter-vehicle">Veículo</label>
+                  <select id="filter-vehicle">
+                    <option value="">Todos os Veículos</option>
+                    <!-- Preenchido via JS -->
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="filter-driver">Motorista</label>
+                  <input type="text" id="filter-driver" placeholder="Nome do motorista...">
+                </div>
+                <div class="form-group">
+                  <label for="filter-route">Rota</label>
+                  <select id="filter-route">
+                    <option value="">Todas as Rotas</option>
+                    <option value="Rota Norte (Azul)">Rota Norte (Azul)</option>
+                    <option value="Rota Sul (Verde)">Rota Sul (Verde)</option>
+                    <option value="Rota Leste (Vermelho)">Rota Leste (Vermelho)</option>
+                    <option value="Rota Oeste (Amarelo)">Rota Oeste (Amarelo)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="filter-actions">
+                <button class="btn-secondary" id="btn-reset-filters"><i class="fa-solid fa-rotate-left"></i> Limpar
+                  Filtros</button>
+                <button class="btn-primary" id="btn-apply-filters"><i class="fa-solid fa-filter"></i> Filtrar
+                  Paradas</button>
+              </div>
+            </div>
+
+            <!-- Tabela de Relatório de Paradas -->
+            <div class="page-card">
+              <div class="table-container">
+                <table class="data-table" id="reports-table">
+                  <thead>
+                    <tr>
+                      <th>Horário</th>
+                      <th>Nome da Parada</th>
+                      <th>Veículo</th>
+                      <th>Tempo Parado</th>
+                      <th>Embarques</th>
+                      <th>Desembarques</th>
+                      <th>Lotação Final</th>
+                    </tr>
+                  </thead>
+                  <tbody id="reports-table-body">
+                    <!-- Inserido dinamicamente via JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- PÁGINA 5: ALERTAS E DESVIOS DE ROTA -->
+        <section class="tab-content" id="alerts-tab">
+          <div class="alerts-layout">
+            <div class="page-card-header">
+              <div class="header-info">
+                <h2>Alertas e Desvios de Rota</h2>
+                <p>Visualize as ocorrências geradas pelo monitoramento de GPS e segurança em tempo real.</p>
+              </div>
+              <div class="alerts-filters">
+                <button class="alert-filter-btn active" data-severity="all">Todos</button>
+                <button class="alert-filter-btn text-danger" data-severity="critical"><span class="bullet red"></span>
+                  Críticos</button>
+                <button class="alert-filter-btn text-warning" data-severity="warning"><span
+                    class="bullet yellow"></span> Atenção</button>
+                <button class="alert-filter-btn text-success" data-severity="normal"><span class="bullet green"></span>
+                  Normal</button>
+              </div>
+            </div>
+
+            <div class="alerts-grid" id="alerts-cards-container">
+              <!-- Inserido dinamicamente via JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- PÁGINA 6: CONFIGURAÇÕES -->
+        <section class="tab-content" id="settings-tab">
+          <div class="settings-grid-layout">
+
+            <!-- Painel Lateral de Abas de Ajustes -->
+            <div class="page-card settings-card">
+              <h3>Ajustes do Painel</h3>
+              <div class="settings-sections-list">
+                <button class="setting-menu-btn active" data-set="simulator">Simulador GPS & Rastreamento</button>
+                <button class="setting-menu-btn" data-set="notifications">Notificações e Alarmes</button>
+                <button class="setting-menu-btn" data-set="profile">Perfil do Administrador</button>
+              </div>
+            </div>
+
+            <!-- Painéis de Configurações Individuais -->
+            <div class="page-card settings-main-panel">
+
+              <!-- Ajustes do Simulador -->
+              <div class="settings-panel-content active" id="setting-panel-simulator">
+                <h2>Configurações do Simulador GPS</h2>
+                <p class="section-desc">Controle o mecanismo interno de simulação que gera movimentações dos veículos de
+                  teste no mapa.</p>
+
+                <div class="form-group-switch">
+                  <div class="switch-info">
+                    <label class="switch-title">Simulação Ativa</label>
+                    <span class="switch-desc">Ativa o motor de GPS dinâmico para mover ônibus nas rotas
+                      simuladas.</span>
+                  </div>
+                  <label class="switch-container">
+                    <input type="checkbox" id="setting-sim-active" checked>
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+
+                <div class="form-group-range">
+                  <div class="range-info">
+                    <label for="setting-sim-speed">Velocidade da Simulação</label>
+                    <span class="range-desc">Define a velocidade das transições de coordenadas (frequência de
+                      atualização: <strong id="setting-sim-speed-val">1s</strong>).</span>
+                  </div>
+                  <input type="range" id="setting-sim-speed" min="1" max="5" value="1" step="1">
+                </div>
+
+                <div class="form-group-switch">
+                  <div class="switch-info">
+                    <label class="switch-title">Geração de Alertas Aleatórios</label>
+                    <span class="switch-desc">Dispara desvios e atrasos esporádicos para testar os alertas
+                      operacionais.</span>
+                  </div>
+                  <label class="switch-container">
+                    <input type="checkbox" id="setting-sim-alerts" checked>
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+
+                <div class="settings-action-row">
+                  <button class="btn-primary" id="btn-save-sim-settings">Salvar Alterações</button>
+                </div>
+              </div>
+
+              <!-- Ajustes de Notificações -->
+              <div class="settings-panel-content hidden" id="setting-panel-notifications">
+                <h2>Notificações e Alarmes</h2>
+                <p class="section-desc">Gerencie como o sistema notifica sobre incidentes de frota críticos e normais.
+                </p>
+
+                <div class="form-group-switch">
+                  <div class="switch-info">
+                    <label class="switch-title">Alarmes Sonoros em Alertas Críticos</label>
+                    <span class="switch-desc">Toca um alerta sonoro de aviso imediato para desvios de rota
+                      graves.</span>
+                  </div>
+                  <label class="switch-container">
+                    <input type="checkbox" id="setting-sound-alerts" checked>
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+
+                <div class="form-group-switch">
+                  <div class="switch-info">
+                    <label class="switch-title">Notificações Push no Navegador</label>
+                    <span class="switch-desc">Permite ao navegador enviar notificações do sistema mesmo em segundo
+                      plano.</span>
+                  </div>
+                  <label class="switch-container">
+                    <input type="checkbox" id="setting-push-alerts">
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+
+                <div class="form-group-switch">
+                  <div class="switch-info">
+                    <label class="switch-title">Histórico de Ocorrências com Auto-Limpeza</label>
+                    <span class="switch-desc">Limpa logs antigos automaticamente ao final de cada turno diário.</span>
+                  </div>
+                  <label class="switch-container">
+                    <input type="checkbox" id="setting-auto-clear" checked>
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+
+                <div class="settings-action-row">
+                  <button class="btn-primary" id="btn-save-notification-settings">Salvar Preferências</button>
+                </div>
+              </div>
+
+              <!-- Perfil do Administrador -->
+              <div class="settings-panel-content hidden" id="setting-panel-profile">
+                <h2>Perfil do Administrador</h2>
+                <p class="section-desc">Atualize as informações públicas e credenciais da conta de administrador logada
+                  no painel.</p>
+
+                <div class="profile-edit-avatar-row">
+                  <img src="../assets/avatar.png" alt="Natalie Barros" class="edit-avatar-img"
+                    id="settings-avatar-preview" onerror="this.src='https://i.pravatar.cc/100?img=47'">
+                  <div class="avatar-edit-controls">
+                    <button class="btn-secondary btn-sm" id="btn-change-avatar">Alterar Imagem</button>
+                    <p class="avatar-rules">Formato JPG ou PNG. Máximo 1MB.</p>
+                  </div>
+                </div>
+
+                <div class="profile-form-grid">
+                  <div class="form-group">
+                    <label for="profile-name">Nome Completo</label>
+                    <input type="text" id="profile-name" value="Natalie Barros">
+                  </div>
+                  <div class="form-group">
+                    <label for="profile-email">E-mail Corporativo</label>
+                    <input type="email" id="profile-email" value="natalie.barros@busgo.com.br">
+                  </div>
+                  <div class="form-group">
+                    <label for="profile-phone">Telefone de Contato</label>
+                    <input type="text" id="profile-phone" value="(11) 98765-4321">
+                  </div>
+                  <div class="form-group">
+                    <label for="profile-role">Cargo / Nível de Acesso</label>
+                    <input type="text" id="profile-role" value="Super Administradora de Frotas" readonly disabled>
+                  </div>
+                </div>
+
+                <div class="settings-action-row">
+                  <button class="btn-primary" id="btn-save-profile-settings">Atualizar Perfil</button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- MODAL DE CADASTRO E EDIÇÃO DE VEÍCULOS -->
+  <div class="modal-backdrop hidden" id="vehicle-modal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="modal-title">Cadastrar Novo Veículo</h3>
+        <button class="modal-close" id="btn-close-modal" aria-label="Fechar Modal">&times;</button>
+      </div>
+      <form id="vehicle-form" novalidate>
+        <input type="hidden" id="vehicle-id-edit">
+
+        <div class="modal-body">
+          <div class="form-row-grid">
+            <div class="form-group">
+              <label for="modal-veh-number">Número do Veículo <span class="required">*</span></label>
+              <input type="text" id="modal-veh-number" placeholder="Ex: 204" required>
+              <span class="form-error-msg">Número inválido ou já existente.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="modal-veh-plate">Placa <span class="required">*</span></label>
+              <input type="text" id="modal-veh-plate" placeholder="Ex: ABC-1234 ou ABC1D23" required>
+              <span class="form-error-msg">Formato de placa inválido.</span>
+            </div>
+          </div>
+
+          <div class="form-row-grid">
+            <div class="form-group">
+              <label for="modal-veh-model">Modelo do Veículo <span class="required">*</span></label>
+              <input type="text" id="modal-veh-model" placeholder="Ex: Mercedes-Benz OF-1721" required>
+              <span class="form-error-msg">Este campo é obrigatório.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="modal-veh-year">Ano de Fabricação <span class="required">*</span></label>
+              <input type="number" id="modal-veh-year" placeholder="Ex: 2022" min="1990" max="2027" required>
+              <span class="form-error-msg">Ano inválido (1990 a 2027).</span>
+            </div>
+          </div>
+
+          <div class="form-row-grid">
+            <div class="form-group">
+              <label for="modal-veh-capacity">Capacidade de Alunos <span class="required">*</span></label>
+              <input type="number" id="modal-veh-capacity" placeholder="Ex: 45" min="10" max="100" required>
+              <span class="form-error-msg">Capacidade inválida (10 a 100).</span>
+            </div>
+
+            <div class="form-group">
+              <label for="modal-veh-route">Rota Operacional <span class="required">*</span></label>
+              <select id="modal-veh-route" required>
+                <option value="">Selecione uma rota...</option>
+                <option value="Rota Norte (Azul)">Rota Norte (Azul)</option>
+                <option value="Rota Sul (Verde)">Rota Sul (Verde)</option>
+                <option value="Rota Leste (Vermelho)">Rota Leste (Vermelho)</option>
+                <option value="Rota Oeste (Amarelo)">Rota Oeste (Amarelo)</option>
+              </select>
+              <span class="form-error-msg">Selecione uma rota válida.</span>
+            </div>
+          </div>
+
+          <div class="form-row-grid">
+            <div class="form-group">
+              <label for="modal-veh-driver">Motorista Responsável <span class="required">*</span></label>
+              <input type="text" id="modal-veh-driver" placeholder="Nome completo" required>
+              <span class="form-error-msg">Nome do motorista é obrigatório.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="modal-veh-phone">Telefone do Motorista <span class="required">*</span></label>
+              <input type="text" id="modal-veh-phone" placeholder="Ex: (11) 99999-9999" required>
+              <span class="form-error-msg">Telefone é obrigatório.</span>
+            </div>
+          </div>
+
+          <div class="form-row-grid">
+            <div class="form-group">
+              <label for="modal-veh-status">Status de Rastreamento</label>
+              <select id="modal-veh-status">
+                <option value="Online">Online</option>
+                <option value="Offline">Offline</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="btn-cancel-modal">Cancelar</button>
+          <button type="submit" class="btn-primary" id="btn-submit-modal">Salvar Veículo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CONTROLADOR PRINCIPAL JAVASCRIPT -->
+  <script src="../scripts/admindashboard.js"></script>
+</body>
+
+</html>

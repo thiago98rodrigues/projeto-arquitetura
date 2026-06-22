@@ -1,0 +1,1319 @@
+/* ==========================================================================
+   ESTILOS ESPECÍFICOS: DRIVERDASHBOARD (BUSWAITER)
+   ========================================================================== */
+
+:root {
+    /* Sobrescrita de variáveis específicas do BusWaiter */
+    --color-primary: #D7F42C;
+    --color-primary-hover: #c5df1d;
+    --color-dark: #07133B;
+    --color-muted: #6F7698;
+    --color-bg: #F2F2F4;
+    --color-white: #FFFFFF;
+    --color-border: #E6E8F0;
+    --color-danger: #F44336;
+    --color-danger-hover: #D32F2F;
+    --color-success: #4CAF50;
+    --font-main: "PT Sans", sans-serif;
+    --font-title: "Special Gothic Expanded One", sans-serif;
+
+    /* Transições */
+    --transition-speed: 300ms;
+    --transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
+
+    /* Sombras */
+    --shadow-sm: 0 0.4rem 1.2rem rgba(7, 19, 59, 0.04);
+    --shadow-md: 0 1rem 2.4rem rgba(7, 19, 59, 0.08);
+    --shadow-lg: 0 2rem 4rem rgba(7, 19, 59, 0.15);
+}
+
+/* ==========================================================================
+   LAYOUT E ESTRUTURA GERAL
+   ========================================================================== */
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    min-height: 100vh;
+    overflow: hidden;
+    background-color: var(--color-bg);
+}
+
+.driver-app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Header */
+.driver-header {
+    background-color: var(--color-white);
+    border-bottom: 0.1rem solid var(--color-border);
+    height: 7.2rem;
+    padding: 0 2.4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+}
+
+
+/* Info Central do Header */
+.header-center {
+    display: flex;
+    align-items: center;
+    gap: 3.2rem;
+}
+
+.speedometer-widget {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.speed-label {
+    font-size: 1.1rem;
+    color: var(--color-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.speed-value {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    font-family: var(--font-title);
+}
+
+.speed-value small {
+    font-size: 1.2rem;
+    font-family: var(--font-main);
+    color: var(--color-muted);
+}
+
+.gps-status-widget {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    background-color: rgba(76, 175, 80, 0.08);
+    border: 0.1rem solid rgba(76, 175, 80, 0.15);
+    padding: 0.6rem 1.4rem;
+    border-radius: 2rem;
+}
+
+.gps-status-widget.offline {
+    background-color: rgba(111, 118, 152, 0.08);
+    border-color: rgba(111, 118, 152, 0.15);
+}
+
+.gps-dot {
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.gps-dot.online {
+    background-color: var(--color-success);
+    box-shadow: 0 0 0.6rem var(--color-success);
+    animation: gpsPulse 2s infinite;
+}
+
+.gps-dot.offline {
+    background-color: var(--color-muted);
+    box-shadow: none;
+}
+
+@keyframes gpsPulse {
+    0% {
+        transform: scale(0.95);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(0.95);
+        opacity: 0.5;
+    }
+}
+
+.gps-text {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-dark);
+}
+
+/* Usuário no Header */
+.header-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 2rem;
+}
+
+.user-greeting {
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+}
+
+.greeting-text {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-dark);
+}
+
+.driver-avatar-wrapper {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 0.2rem solid var(--color-border);
+}
+
+.driver-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.settings-trigger {
+    background: none;
+    border: none;
+    color: var(--color-muted);
+    font-size: 1.8rem;
+    cursor: pointer;
+    padding: 0.8rem;
+    border-radius: 0.8rem;
+    transition: all 150ms ease;
+}
+
+.settings-trigger:hover {
+    color: var(--color-dark);
+    background-color: var(--color-bg);
+}
+
+/* ==========================================================================
+   LAYOUT PRINCIPAL
+   ========================================================================== */
+.driver-main-layout {
+    display: flex;
+    flex-grow: 1;
+    height: calc(100vh - 7.2rem);
+    position: relative;
+}
+
+.scrollable {
+    overflow-y: auto;
+}
+
+/* Configurações Comuns dos Painéis Laterais */
+.routes-panel,
+.chat-panel {
+    background-color: var(--color-white);
+    display: flex;
+    flex-direction: column;
+    z-index: 90;
+    flex-shrink: 0;
+    transition: transform var(--transition-speed) var(--transition-ease), width var(--transition-speed) var(--transition-ease);
+}
+
+.panel-header-row {
+    padding: 2.4rem;
+    border-bottom: 0.1rem solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.panel-header-row h2 {
+    font-size: 1.6rem;
+    color: var(--color-dark);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.panel-header-row h2 i {
+    color: var(--color-muted);
+}
+
+.drawer-close-btn {
+    display: none;
+    /* Só mostra no mobile */
+    background: none;
+    border: none;
+    font-size: 2.6rem;
+    color: var(--color-muted);
+    cursor: pointer;
+}
+
+/* ==========================================================================
+   PAINEL DE ROTAS (COLUNA ESQUERDA)
+   ========================================================================== */
+.routes-panel {
+    width: 28rem;
+    border-right: 0.1rem solid var(--color-border);
+}
+
+.routes-list {
+    padding: 2rem 1.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+    flex-grow: 1;
+}
+
+/* Rota Card */
+.driver-route-card {
+    border: 0.1rem solid var(--color-border);
+    border-radius: 1.6rem;
+    padding: 1.8rem;
+    background-color: var(--color-white);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+    transition: all var(--transition-speed) var(--transition-ease);
+}
+
+.driver-route-card:hover {
+    border-color: var(--color-muted-light);
+    transform: translateY(-0.2rem);
+    box-shadow: var(--shadow-sm);
+}
+
+.driver-route-card.active {
+    border-color: var(--color-primary);
+    background-color: rgba(215, 244, 44, 0.02);
+    box-shadow: var(--shadow-md);
+}
+
+.driver-route-card.active .route-title h3 {
+    color: var(--color-dark);
+}
+
+.route-title h3 {
+    font-size: 1.5rem;
+    color: var(--color-muted);
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.route-meta-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    color: var(--color-muted);
+}
+
+.route-meta-row strong {
+    color: var(--color-dark);
+}
+
+.route-footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 0.1rem solid var(--color-border);
+    padding-top: 1.2rem;
+}
+
+.route-status-pill {
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 0.4rem 1rem;
+    border-radius: 0.8rem;
+}
+
+.route-status-pill.active {
+    background-color: rgba(76, 175, 80, 0.1);
+    color: var(--color-success);
+}
+
+.route-status-pill.paused {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #FFB300;
+}
+
+.route-status-pill.waiting {
+    background-color: rgba(0, 136, 255, 0.1);
+    color: #0088ff;
+}
+
+.route-status-pill.finished {
+    background-color: rgba(111, 118, 152, 0.1);
+    color: var(--color-muted);
+}
+
+.route-time-badge {
+    background-color: var(--color-bg);
+    border: 0.1rem solid var(--color-border);
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 0.4rem 1rem;
+    border-radius: 2rem;
+    color: var(--color-dark);
+}
+
+.driver-route-card.inactive {
+    opacity: 0.65;
+}
+
+/* ==========================================================================
+   VISUALIZAÇÃO DO MAPA (COLUNA CENTRAL)
+   ========================================================================== */
+.map-viewport {
+    flex-grow: 1;
+    position: relative;
+    height: 100%;
+}
+
+#map {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+}
+
+/* Controles Mobile Flutuantes */
+.map-floating-header-mobile {
+    display: none;
+    /* Só aparece no mobile */
+    position: absolute;
+    top: 1.6rem;
+    left: 1.6rem;
+    right: 1.6rem;
+    z-index: 50;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mobile-toggle-btn {
+    background-color: var(--color-white);
+    border: none;
+    box-shadow: var(--shadow-md);
+    padding: 1.2rem 1.6rem;
+    border-radius: 1.2rem;
+    color: var(--color-dark);
+    font-weight: 700;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    cursor: pointer;
+    position: relative;
+}
+
+.mobile-toggle-btn i {
+    font-size: 1.6rem;
+    color: var(--color-muted);
+}
+
+.chat-badge {
+    position: absolute;
+    top: -0.6rem;
+    right: -0.6rem;
+    background-color: var(--color-danger);
+    color: var(--color-white);
+    font-size: 1rem;
+    font-weight: 700;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0.2rem solid var(--color-white);
+}
+
+.chat-badge.hidden {
+    display: none;
+}
+
+.mobile-speed-badge {
+    background-color: var(--color-dark);
+    color: var(--color-white);
+    box-shadow: var(--shadow-md);
+    padding: 0.8rem 1.6rem;
+    border-radius: 2rem;
+    font-family: var(--font-title);
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.mobile-speed-badge small {
+    font-family: var(--font-main);
+    font-size: 1.1rem;
+    color: var(--color-muted-light);
+}
+
+/* Card Flutuante de Próxima Parada */
+.next-stop-floating-card {
+    position: absolute;
+    top: 2.4rem;
+    left: 2.4rem;
+    width: 36rem;
+    background-color: var(--color-white);
+    border-radius: 2rem;
+    box-shadow: var(--shadow-md);
+    border: 0.1rem solid var(--color-border);
+    z-index: 50;
+    padding: 1.8rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+    transition: transform var(--transition-speed) ease;
+}
+
+.stop-card-main {
+    display: flex;
+    align-items: center;
+    gap: 1.6rem;
+}
+
+.stop-icon {
+    width: 4.8rem;
+    height: 4.8rem;
+    background-color: rgba(215, 244, 44, 0.15);
+    color: var(--color-dark);
+    border-radius: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.stop-info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.stop-caption {
+    font-size: 1.1rem;
+    color: var(--color-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.stop-info h3 {
+    font-size: 1.6rem;
+    color: var(--color-dark);
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 0.2rem;
+}
+
+.stop-metrics {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    flex-shrink: 0;
+}
+
+.eta-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-success);
+    font-family: var(--font-title);
+}
+
+.dist-value {
+    font-size: 1.2rem;
+    color: var(--color-muted);
+    font-weight: 700;
+}
+
+.stop-card-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    border-top: 0.1rem solid var(--color-border);
+    padding-top: 1.4rem;
+}
+
+.progress-bar-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    color: var(--color-muted);
+    font-weight: 700;
+}
+
+.progress-bar-bg {
+    height: 0.8rem;
+    background-color: var(--color-bg);
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background-color: var(--color-success);
+    border-radius: 1rem;
+    transition: width 0.4s ease;
+}
+
+/* Botões Circulares Flutuantes de Ação no Mapa */
+.map-action-buttons {
+    position: absolute;
+    bottom: 3.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 2.4rem;
+    z-index: 50;
+}
+
+.btn-action-circle {
+    background-color: var(--color-white);
+    border: none;
+    width: 8.8rem;
+    height: 8.8rem;
+    border-radius: 50%;
+    box-shadow: var(--shadow-lg);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: transform var(--transition-speed) var(--transition-ease), box-shadow var(--transition-speed) var(--transition-ease);
+}
+
+.btn-circle-icon {
+    width: 3.6rem;
+    height: 3.6rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+}
+
+.btn-action-circle span {
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* Estilo do Botão Parada */
+.btn-stop-register {
+    background-color: var(--color-primary);
+    color: var(--color-dark);
+}
+
+
+
+.btn-stop-register:hover {
+    background-color: var(--color-primary-hover);
+    transform: scale(1.05);
+}
+
+/* Estilo do Botão Encerrar */
+.btn-shift-end {
+    background-color: var(--color-danger);
+    color: var(--color-white);
+}
+
+
+.btn-shift-end:hover {
+    background-color: var(--color-danger-hover);
+    transform: scale(1.05);
+}
+
+/* ==========================================================================
+   PAINEL DE CHAT DA CENTRAL (COLUNA DIREITA)
+   ========================================================================== */
+.chat-panel {
+    width: 32rem;
+    border-left: 0.1rem solid var(--color-border);
+}
+
+/* Histórico do Chat */
+.chat-history-container {
+    flex-grow: 1;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+}
+
+/* Bubbles de Mensagem */
+.chat-bubble {
+    display: flex;
+    flex-direction: column;
+    max-width: 85%;
+    padding: 1.2rem 1.6rem;
+    border-radius: 1.6rem;
+    font-size: 1.3rem;
+    line-height: 1.4;
+}
+
+.chat-bubble.central {
+    background-color: var(--color-bg);
+    color: var(--color-dark);
+    align-self: flex-start;
+    border-bottom-left-radius: 0.4rem;
+}
+
+.chat-bubble.driver {
+    background-color: var(--color-dark);
+    color: var(--color-white);
+    align-self: flex-end;
+    border-bottom-right-radius: 0.4rem;
+}
+
+.chat-meta {
+    font-size: 1rem;
+    opacity: 0.6;
+    margin-top: 0.6rem;
+    text-align: right;
+}
+
+/* Alertas Automáticos de Central */
+.chat-system-alert {
+    background-color: rgba(255, 235, 59, 0.15);
+    border: 0.1rem solid rgba(255, 193, 7, 0.3);
+    border-left: 0.4rem solid #FFB300;
+    padding: 1.2rem;
+    border-radius: 0.8rem;
+    color: #855800;
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+/* Ocorrências Rápidas */
+.quick-occurrences-section {
+    padding: 1.6rem 2rem;
+    border-top: 0.1rem solid var(--color-border);
+    background-color: var(--color-bg);
+}
+
+.quick-occurrences-section h3 {
+    font-size: 1.2rem;
+    color: var(--color-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+}
+
+.quick-buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+}
+
+.btn-quick-report {
+    background-color: var(--color-white);
+    border: 0.1rem solid var(--color-border);
+    padding: 0.8rem 1rem;
+    border-radius: 0.8rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: all 150ms ease;
+}
+
+.btn-quick-report:hover {
+    background-color: var(--color-dark);
+    color: var(--color-white);
+    border-color: var(--color-dark);
+}
+
+.btn-quick-report i {
+    font-size: 1.2rem;
+    color: var(--color-muted);
+}
+
+.btn-quick-report:hover i {
+    color: var(--color-primary);
+}
+
+/* Input do Chat */
+.chat-input-row {
+    padding: 1.6rem 2rem;
+    border-top: 0.1rem solid var(--color-border);
+    display: flex;
+    gap: 1rem;
+    background-color: var(--color-white);
+}
+
+.chat-input-row input {
+    flex-grow: 1;
+    padding: 1.2rem 1.6rem;
+    border-radius: 2.4rem;
+    border: 0.1rem solid var(--color-border);
+    font-size: 1.3rem;
+    background-color: var(--color-bg);
+}
+
+.chat-input-row input:focus {
+    outline: none;
+    border-color: var(--color-dark);
+    background-color: var(--color-white);
+}
+
+.btn-chat-send {
+    width: 4.4rem;
+    height: 4.4rem;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    color: var(--color-dark);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: 0 0.2rem 0.6rem rgba(215, 244, 44, 0.3);
+    transition: all 150ms ease;
+}
+
+.btn-chat-send:hover {
+    background-color: var(--color-primary-hover);
+    transform: scale(1.05);
+}
+
+/* ==========================================================================
+   MODAIS OPERACIONAIS
+   ========================================================================== */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(7, 19, 59, 0.7);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    transition: opacity 250ms ease;
+}
+
+.modal-backdrop.hidden {
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-container {
+    background-color: var(--color-white);
+    border-radius: 2rem;
+    width: 48rem;
+    max-width: 90%;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    animation: modalPopIn 250ms var(--transition-ease);
+}
+
+@keyframes modalPopIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-header {
+    background-color: var(--color-dark);
+    color: var(--color-white);
+    padding: 1.8rem 2.4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    font-size: 1.6rem;
+    color: var(--color-white);
+}
+
+.modal-header.header-danger {
+    background-color: var(--color-danger);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 2.8rem;
+    cursor: pointer;
+}
+
+.modal-close:hover {
+    color: var(--color-primary);
+}
+
+.modal-body {
+    padding: 2.4rem;
+}
+
+.modal-intro-text {
+    font-size: 1.4rem;
+    color: var(--color-muted);
+    line-height: 1.5;
+    margin-bottom: 2rem;
+}
+
+.modal-intro-text strong {
+    color: var(--color-dark);
+    font-size: 1.6rem;
+}
+
+/* Stepper de Controles Numéricos (UX de Toque) */
+.modal-number-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.number-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.number-input-group label {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--color-dark);
+}
+
+.stepper-controls {
+    display: flex;
+    border: 0.1rem solid var(--color-border);
+    border-radius: 1.2rem;
+    overflow: hidden;
+    height: 4.8rem;
+}
+
+.btn-stepper {
+    background-color: var(--color-bg);
+    border: none;
+    width: 4.8rem;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    cursor: pointer;
+    transition: background-color 150ms ease;
+}
+
+.btn-stepper:hover {
+    background-color: var(--color-border);
+}
+
+.stepper-controls input {
+    flex-grow: 1;
+    width: 0;
+    text-align: center;
+    border: none;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-dark);
+}
+
+/* Desabilita spinners padrão do input number */
+.stepper-controls input::-webkit-outer-spin-button,
+.stepper-controls input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.stepper-controls input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.form-group label {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--color-dark);
+}
+
+.form-group textarea {
+    padding: 1.2rem;
+    border-radius: 1.2rem;
+    border: 0.1rem solid var(--color-border);
+    font-size: 1.3rem;
+    resize: none;
+}
+
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-dark);
+}
+
+.modal-footer {
+    padding: 1.6rem 2.4rem;
+    background-color: var(--color-bg);
+    border-top: 0.1rem solid var(--color-border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 1.2rem;
+}
+
+/* Modal de Alerta / Encerramento */
+.modal-alert .modal-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 3.2rem 2.4rem;
+}
+
+.alert-icon-modal {
+    font-size: 5.6rem;
+    margin-bottom: 1.6rem;
+}
+
+.modal-alert h2 {
+    font-size: 2rem;
+    color: var(--color-dark);
+    margin-bottom: 0.8rem;
+}
+
+.modal-alert p {
+    font-size: 1.4rem;
+    color: var(--color-muted);
+    line-height: 1.5;
+}
+
+/* ==========================================================================
+   TOASTS (NOTIFICAÇÕES DO SISTEMA)
+   ========================================================================== */
+.toast-container {
+    position: fixed;
+    bottom: 2.4rem;
+    right: 2.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    z-index: 300;
+}
+
+.toast {
+    background-color: var(--color-white);
+    border-radius: 1.2rem;
+    padding: 1.6rem 2rem;
+    box-shadow: var(--shadow-lg);
+    border: 0.1rem solid var(--color-border);
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+    min-width: 32rem;
+    max-width: 40rem;
+    animation: toastSlideIn 300ms var(--transition-ease);
+}
+
+@keyframes toastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(2rem) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.toast.toast-success {
+    border-left: 0.4rem solid var(--color-success);
+}
+
+.toast.toast-error {
+    border-left: 0.4rem solid var(--color-danger);
+}
+
+.toast.toast-info {
+    border-left: 0.4rem solid #0088ff;
+}
+
+.toast.toast-warning {
+    border-left: 0.4rem solid #FFB300;
+}
+
+.toast-icon {
+    font-size: 1.8rem;
+}
+
+.toast.toast-success .toast-icon {
+    color: var(--color-success);
+}
+
+.toast.toast-error .toast-icon {
+    color: var(--color-danger);
+}
+
+.toast.toast-info .toast-icon {
+    color: #0088ff;
+}
+
+.toast.toast-warning .toast-icon {
+    color: #FFB300;
+}
+
+.toast-message {
+    font-size: 1.3rem;
+    color: var(--color-dark);
+    flex-grow: 1;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: var(--color-muted-light);
+    cursor: pointer;
+    font-size: 1.6rem;
+}
+
+.toast-close:hover {
+    color: var(--color-dark);
+}
+
+/* ==========================================================================
+   ESTILOS DE MARCADORES DO MAPA LEAFLET
+   ========================================================================== */
+.custom-leaflet-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.marker-pin-stop {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    border: 0.2rem solid var(--color-white);
+    box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-white);
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.marker-pin-stop.completed {
+    background-color: var(--color-muted);
+}
+
+.marker-pin-stop.pending {
+    background-color: #0088ff;
+}
+
+.marker-pin-stop.next {
+    background-color: var(--color-primary);
+    color: var(--color-dark);
+    border-color: var(--color-dark);
+    width: 2.8rem;
+    height: 2.8rem;
+    font-size: 1.2rem;
+    animation: nextStopPulse 1.5s infinite;
+}
+
+@keyframes nextStopPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(215, 244, 44, 0.6);
+    }
+
+    70% {
+        box-shadow: 0 0 0 1rem rgba(215, 244, 44, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(215, 244, 44, 0);
+    }
+}
+
+.marker-pin-bus {
+    background-color: var(--color-dark);
+    color: var(--color-primary);
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    border: 0.2rem solid var(--color-white);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+}
+
+.marker-pin-bus-halo {
+    position: absolute;
+    width: 6rem;
+    height: 6rem;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    opacity: 0.25;
+    animation: busPulse 2s infinite ease-out;
+}
+
+@keyframes busPulse {
+    0% {
+        transform: scale(0.6);
+        opacity: 0.4;
+    }
+
+    100% {
+        transform: scale(1.2);
+        opacity: 0;
+    }
+}
+
+/* ==========================================================================
+   RESPONSIVIDADE (TABLET & MOBILE)
+   ========================================================================== */
+
+/* TABLET LAYOUT (<= 1024px) */
+@media (max-width: 1024px) {
+    .routes-panel {
+        width: 24rem;
+    }
+
+    .chat-panel {
+        width: 28rem;
+    }
+
+    .next-stop-floating-card {
+        width: 32rem;
+        left: 1.6rem;
+        top: 1.6rem;
+    }
+
+    .map-action-buttons {
+        bottom: 2.4rem;
+    }
+
+    .btn-action-circle {
+        width: 8rem;
+        height: 8rem;
+    }
+}
+
+/* MOBILE LAYOUT (<= 768px) */
+@media (max-width: 768px) {
+
+    /* Ocultar elementos desktop no header */
+    .header-center,
+    .user-greeting {
+        display: none;
+    }
+
+    .driver-header {
+        padding: 0 1.6rem;
+        height: 6rem;
+    }
+
+    .driver-main-layout {
+        height: calc(100vh - 6rem);
+    }
+
+    /* Mostrar cabeçalho mobile flutuante sobre o mapa */
+    .map-floating-header-mobile {
+        display: flex;
+    }
+
+    /* Transformar painéis laterais em gavetas deslizantes */
+    .routes-panel,
+    .chat-panel {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100% !important;
+        height: 60vh;
+        border: none;
+        border-top: 0.1rem solid var(--color-border);
+        border-top-left-radius: 2.4rem;
+        border-top-right-radius: 2.4rem;
+        box-shadow: 0 -0.5rem 2rem rgba(7, 19, 59, 0.15);
+        transform: translateY(105%);
+        z-index: 150;
+    }
+
+    .routes-panel.open,
+    .chat-panel.open {
+        transform: translateY(0);
+    }
+
+    .drawer-close-btn {
+        display: block;
+    }
+
+    /* Reposicionar o card flutuante de parada no mobile */
+    .next-stop-floating-card {
+        top: auto;
+        bottom: 15rem;
+        /* Acima dos botões de ação */
+        left: 1.6rem;
+        right: 1.6rem;
+        width: calc(100% - 3.2rem);
+    }
+
+    /* Botões flutuantes fixos acima dos drawers */
+    .map-action-buttons {
+        bottom: 3.2rem;
+        width: 100%;
+        justify-content: center;
+        gap: 4rem;
+    }
+
+    /* Modais em tela cheia no mobile */
+    .modal-container {
+        width: 100%;
+        height: 100%;
+        max-width: none;
+        border-radius: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modal-body {
+        flex-grow: 1;
+        overflow-y: auto;
+    }
+
+    .modal-footer {
+        padding: 1.6rem;
+    }
+
+    .modal-footer button {
+        flex: 1;
+    }
+
+    .modal-number-inputs {
+        grid-template-columns: 1fr;
+        gap: 1.6rem;
+    }
+}

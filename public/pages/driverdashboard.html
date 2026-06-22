@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Módulo do Motorista - Rastreamento e registro de paradas em tempo real BusWaiter.">
+  <title>Painel do Motorista — BusWaiter</title>
+
+  <!-- Font Awesome para ícones -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <!-- Leaflet CSS para Mapas -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+
+  <!-- Estilos globais e locais -->
+  <link rel="stylesheet" href="../styles/main.css">
+  <link rel="stylesheet" href="../styles/driverdashboard.css">
+</head>
+
+<body>
+
+  <!-- Mensagem de Alerta Flutuante (Toast) -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- CONTAINER DO APLICATIVO -->
+  <div class="driver-app-container">
+
+    <!-- HEADER SUPERIOR -->
+    <header class="driver-header">
+      <div class="header-left">
+        <!-- Logo BusWaiter Estilizado -->
+        <div class="logo">
+          <div class="logo-box">
+            <i class="fa-solid fa-bus"></i>
+          </div>
+          <span class="logo-text">BUSWAITER</span>
+        </div>
+      </div>
+
+      <!-- Info Operacional Rápida (Desktop/Tablet) -->
+      <div class="header-center">
+        <div class="speedometer-widget">
+          <span class="speed-label">Velocidade</span>
+          <span class="speed-value" id="current-speed">0 <small>km/h</small></span>
+        </div>
+        <div class="gps-status-widget">
+          <span class="gps-dot online" id="gps-dot"></span>
+          <span class="gps-text" id="gps-text">GPS Online</span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <!-- Saudação e Avatar -->
+        <div class="user-greeting">
+          <span class="greeting-text">👋 Olá, João Flavio</span>
+          <div class="driver-avatar-wrapper">
+            <img src="../assets/avatar.png" alt="Avatar Motorista" class="driver-avatar"
+              onerror="this.src='https://i.pravatar.cc/100?img=60'">
+          </div>
+        </div>
+        <button class="settings-trigger" id="settings-trigger" aria-label="Configurações">
+          <i class="fa-solid fa-gear"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- ÁREA PRINCIPAL COM 3 COLUNAS NO DESKTOP -->
+    <div class="driver-main-layout">
+
+      <!-- COLUNA ESQUERDA: SUAS ROTAS (DRAWER NO MOBILE) -->
+      <aside class="routes-panel" id="routes-panel">
+        <div class="panel-header-row">
+          <h2><i class="fa-regular fa-map"></i> Suas Rotas</h2>
+          <button class="drawer-close-btn" id="routes-close-btn">&times;</button>
+        </div>
+
+        <div class="routes-list scrollable" id="routes-list-container">
+          <!-- Inserido dinamicamente via JS -->
+        </div>
+      </aside>
+
+      <!-- COLUNA CENTRAL: MAPA (FOCAL) -->
+      <main class="map-viewport">
+        <!-- Leaflet Map Container -->
+        <div id="map" aria-label="Mapa de navegação GPS"></div>
+
+        <!-- CONTROLES FLUTUANTES NO MOBILE (Barra superior do mapa) -->
+        <div class="map-floating-header-mobile">
+          <button class="mobile-toggle-btn" id="btn-toggle-routes" title="Rotas">
+            <i class="fa-solid fa-route"></i>
+            <span>Rotas</span>
+          </button>
+
+          <div class="mobile-speed-badge">
+            <span id="current-speed-mobile">0</span> <small>km/h</small>
+          </div>
+
+          <button class="mobile-toggle-btn" id="btn-toggle-chat" title="Mensagens">
+            <i class="fa-solid fa-comments"></i>
+            <span class="chat-badge hidden" id="chat-badge-mobile">1</span>
+            <span>Mensagens</span>
+          </button>
+        </div>
+
+        <!-- CARD FLUTUANTE: INFORMAÇÕES DA PRÓXIMA PARADA -->
+        <div class="next-stop-floating-card" id="next-stop-card">
+          <div class="stop-card-main">
+            <div class="stop-icon">
+              <i class="fa-solid fa-location-crosshairs"></i>
+            </div>
+            <div class="stop-info">
+              <span class="stop-caption">Próxima parada</span>
+              <h3 id="next-stop-name">Calculando rota...</h3>
+            </div>
+            <div class="stop-metrics">
+              <span class="eta-value" id="next-stop-eta">-- min</span>
+              <span class="dist-value" id="next-stop-dist">-- km</span>
+            </div>
+          </div>
+          <div class="stop-card-progress">
+            <div class="progress-bar-row">
+              <span id="route-progress-label">0 / 0 paradas concluídas</span>
+              <span id="route-progress-percent">0%</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="route-progress-bar" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTÕES CIRCULARES FLUTUANTES DE AÇÃO (CENTRAL INFERIOR) -->
+        <div class="map-action-buttons">
+          <button class="btn-action-circle btn-stop-register" id="btn-register-stop" aria-label="Registrar Parada">
+            <div class="btn-circle-icon">
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
+            <span>Parada</span>
+          </button>
+
+          <button class="btn-action-circle btn-shift-end" id="btn-end-shift" aria-label="Encerrar Turno">
+            <div class="btn-circle-icon">
+              <i class="fa-solid fa-circle-minus"></i>
+            </div>
+            <span>Encerrar</span>
+          </button>
+        </div>
+      </main>
+
+      <!-- COLUNA DIREITA: CENTRAL DE OPERAÇÕES (DRAWER NO MOBILE) -->
+      <aside class="chat-panel" id="chat-panel">
+        <div class="panel-header-row">
+          <h2><i class="fa-solid fa-comments"></i> Central de Operações</h2>
+          <button class="drawer-close-btn" id="chat-close-btn">&times;</button>
+        </div>
+
+        <!-- Chat Histórico -->
+        <div class="chat-history-container scrollable" id="chat-history">
+          <!-- Inserido dinamicamente via JS -->
+        </div>
+
+        <!-- Ações Rápidas de Ocorrência -->
+        <div class="quick-occurrences-section">
+          <h3>Relatar Ocorrência Rápida</h3>
+          <div class="quick-buttons-grid">
+            <button class="btn-quick-report" data-type="Trânsito intenso">
+              <i class="fa-solid fa-car-side"></i> Trânsito
+            </button>
+            <button class="btn-quick-report" data-type="Acidente na via">
+              <i class="fa-solid fa-burst"></i> Acidente
+            </button>
+            <button class="btn-quick-report" data-type="Veículo com problema">
+              <i class="fa-solid fa-screwdriver-wrench"></i> Mecânico
+            </button>
+            <button class="btn-quick-report" data-type="Parada bloqueada">
+              <i class="fa-solid fa-ban"></i> Bloqueio
+            </button>
+            <button class="btn-quick-report" data-type="Desvio de rota">
+              <i class="fa-solid fa-route"></i> Desvio
+            </button>
+          </div>
+        </div>
+
+        <!-- Input de Mensagem Manual -->
+        <form class="chat-input-row" id="chat-input-form">
+          <input type="text" id="chat-message-input" placeholder="Informar desvio de rota ou ocorrência..."
+            autocomplete="off">
+          <button type="submit" class="btn-chat-send" aria-label="Enviar Mensagem">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </form>
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- MODAL 1: REGISTRAR PARADA -->
+  <div class="modal-backdrop hidden" id="stop-modal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>Registrar Parada Atual</h3>
+        <button class="modal-close" id="btn-close-stop-modal">&times;</button>
+      </div>
+      <form id="stop-form">
+        <div class="modal-body">
+          <p class="modal-intro-text">Confirme os dados de embarque e desembarque no ponto: <br><strong
+              id="modal-stop-name">Ponto Central</strong></p>
+
+          <div class="modal-number-inputs">
+            <!-- Entrada de Embarques -->
+            <div class="number-input-group">
+              <label for="stop-boardings">Embarques (Entrada)</label>
+              <div class="stepper-controls">
+                <button type="button" class="btn-stepper" data-action="minus"
+                  data-target="stop-boardings">&minus;</button>
+                <input type="number" id="stop-boardings" min="0" max="60" value="0">
+                <button type="button" class="btn-stepper" data-action="plus"
+                  data-target="stop-boardings">&plus;</button>
+              </div>
+            </div>
+
+            <!-- Entrada de Desembarques -->
+            <div class="number-input-group">
+              <label for="stop-alightings">Desembarques (Saída)</label>
+              <div class="stepper-controls">
+                <button type="button" class="btn-stepper" data-action="minus"
+                  data-target="stop-alightings">&minus;</button>
+                <input type="number" id="stop-alightings" min="0" max="60" value="0">
+                <button type="button" class="btn-stepper" data-action="plus"
+                  data-target="stop-alightings">&plus;</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Observações -->
+          <div class="form-group" style="margin-top: 1.6rem;">
+            <label for="stop-notes">Observações (Opcional)</label>
+            <textarea id="stop-notes" rows="2"
+              placeholder="Ex: Atraso devido a trânsito, aluno faltante, etc."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="btn-cancel-stop-modal">Cancelar</button>
+          <button type="submit" class="btn-primary">Confirmar Parada</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: CONFIRMAR ENCERRAMENTO DE TURNO -->
+  <div class="modal-backdrop hidden" id="shift-modal">
+    <div class="modal-container modal-alert">
+      <div class="modal-header header-danger">
+        <h3>Encerrar Turno Operacional</h3>
+        <button class="modal-close" id="btn-close-shift-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="alert-icon-modal text-danger">
+          <i class="fa-solid fa-circle-exclamation"></i>
+        </div>
+        <h2>Deseja realmente encerrar o turno?</h2>
+        <p>Ao confirmar, o rastreamento GPS será finalizado e o veículo UBB-1254 será marcado como offline no sistema de
+          frota.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" id="btn-cancel-shift-modal">Cancelar</button>
+        <button type="button" class="btn-danger" id="btn-confirm-shift-modal">Confirmar Encerramento</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS para mapas -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <!-- Script do painel do motorista -->
+  <script src="../scripts/driverdashboard.js"></script>
+</body>
+
+</html>
